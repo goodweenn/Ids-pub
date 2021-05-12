@@ -29,7 +29,7 @@ class IDs
     string  ComposeString();
     bool    Increment(string& Result, int TargetPair);
 
-    pair<char, unsigned int> CreateInitialPair(size_t CurPairIndex = 0);
+    pair<char, unsigned int> CreateInitialPair(size_t CurPairIndex);
 
 public:
 
@@ -152,7 +152,7 @@ bool IDs::Increment(string &Result, int TargetPair)
                 if (Id.size() == MAX_ID_SIZE)  return false;
 
                 // Create new pair
-                Id.push_back(CreateInitialPair());
+                Id.push_back(CreateInitialPair(CurrentPairIndex));
             }
             else
             {
