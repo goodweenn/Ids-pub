@@ -223,8 +223,6 @@ int main()
         cout << endl<< "Test of an approach to set incorrect ID:" << endl << ex.what() << endl;
     }
 
-
     return 0;
-
 }
 
