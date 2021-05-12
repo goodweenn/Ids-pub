@@ -1,7 +1,4 @@
-﻿// Ids.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <sstream>
 #include <thread>
@@ -9,19 +6,23 @@
 
 using namespace std;
 
-#define ALPHABET 'A','B','C','E','H','I','K','L','N','O','P','R','S','T','U','W','X','Y','Z'
-#define NO_PAIR -1
-#define DELIMETER '-'
-#define PAIR_SIZE 2
-#define MAX_SIZE 29
-#define MAX_ID_SIZE 10
-
+#define ID_ALPHABET 'A','B','C','E','H','I','K','L','N','O','P','R','S','T','U','W','X','Y','Z'
 
 class ID
 {
+public:
+
+    const int NO_PAIR = -1;
+    const char DELIMETER = '-';
+    const size_t PAIR_SIZE=2;
+    const size_t MAX_SIZE = 29;
+    const size_t MAX_ID_SIZE = 10;
+
+private:
+
     vector<pair<char, unsigned int>> Id;
 
-    inline static const vector<char> AllowedSymbols = { ALPHABET };
+    inline static const vector<char> AllowedSymbols = { ID_ALPHABET };
 
     mutex Mutex;
 
