@@ -29,7 +29,7 @@ class IDs
     string  ComposeString();
     bool    Increment(string& Result, int TargetPair);
 
-    pair<char, unsigned int> CreateInitialPair(size_t CurPair = 0); 
+    pair<char, unsigned int> CreateInitialPair(size_t CurPairIndex = 0);
 
 public:
 
@@ -115,14 +115,14 @@ string IDs::ComposeString()
 
     return Res;
 }
-pair<char, unsigned int> IDs::CreateInitialPair(size_t CurPair)
+pair<char, unsigned int> IDs::CreateInitialPair(size_t CurPairIndex)
 {
     pair<char, unsigned int> NewPair;
 
     NewPair.first = AllowedSymbols[0];
     NewPair.second = 1;
 
-    Id[CurPair] = NewPair;
+    Id[CurPairIndex] = NewPair;
 
     return NewPair;
 }
