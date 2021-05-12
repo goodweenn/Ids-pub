@@ -13,6 +13,8 @@ using namespace std;
 #define NO_PAIR -1
 #define DELIMETER '-'
 #define PAIR_SIZE 2
+#define MAX_SIZE 29
+#define MAX_ID_SIZE 10
 
 
 class IDs
@@ -25,19 +27,22 @@ class IDs
 
     bool    Assign(string _Id);
     string  ComposeString();
-    bool    Increment(string& result, int TargetPair);
+    bool    Increment(string& Result, int TargetPair);
+
+    pair<char, unsigned int> AddNewPair(size_t CurPair = 0);
 
 public:
 
     string  Increment()
     {
-        string Tmp;
-
         Mutex.lock();
-        bool res = Increment(Tmp, NO_PAIR);
+
+        string Tmp;
+        bool Res = Increment(Tmp, NO_PAIR);
+
         Mutex.unlock();
 
-        if (!res) throw std::out_of_range("Upper bound is violated");
+        if (!Res) throw std::out_of_range("Upper bound is violated");
         return Tmp;
     }
 
@@ -55,17 +60,16 @@ public:
         Mutex.lock();
 
         Id.clear();
-        bool res = Assign(_Id);
+        bool Res = Assign(_Id);
 
         Mutex.unlock();
 
-        if (!res) throw std::out_of_range("Incorrect Value");
+        if (!Res) throw std::out_of_range("Incorrect Value");
     }
 
-    // Constructors
     IDs(string _Id)
     {
-        if (!Assign(_Id)) throw std::out_of_range("Incorrect Value");;
+        if (!Assign(_Id)) throw std::out_of_range("Incorrect Value");
     }
 
     IDs() {}
@@ -75,7 +79,7 @@ public:
 
 bool IDs::Assign(string _Id)
 {
-    if (_Id.empty() || _Id.size() > 29) return false;
+    if (_Id.empty() || _Id.size() > MAX_SIZE) return false;
 
     string token;
     istringstream tokenStream(_Id);
@@ -87,7 +91,7 @@ bool IDs::Assign(string _Id)
         char _first = toupper(token[0]);
         if (find(begin(AllowedSymbols), end(AllowedSymbols), _first) == end(AllowedSymbols)) return false;
 
-        unsigned int _second = atoi(token.data()+1);
+        unsigned int _second = atoi(token.data() + 1);
         if (!_second) return false;
 
         Id.push_back(make_pair(_first, _second));
@@ -111,16 +115,29 @@ string IDs::ComposeString()
 
     return Res;
 }
-
-bool IDs::Increment(string &result, int TargetPair)
+pair<char, unsigned int> IDs::AddNewPair(size_t CurPair)
 {
-    size_t CurrentPair = (TargetPair == NO_PAIR) ? Id.size() - 1 : TargetPair;
+    pair<char, unsigned int> NewPair;
+
+    NewPair.first = AllowedSymbols[0];
+    NewPair.second = 1;
+
+    Id[CurPair] = NewPair;
+
+    return NewPair;
+}
+
+
+bool IDs::Increment(string &Result, int TargetPair)
+{
+    size_t CurrentPair = (TargetPair == NO_PAIR) ? Id.size() - 1 : (size_t)TargetPair;
 
     Id[CurrentPair].second++;
 
     if (Id[CurrentPair].second == 10)
     {
         Id[CurrentPair].second = 1;
+
         auto CurLetter = find(begin(AllowedSymbols), end(AllowedSymbols), Id[CurrentPair].first);
 
         if (*CurLetter != AllowedSymbols[AllowedSymbols.size()-1])
@@ -131,28 +148,22 @@ bool IDs::Increment(string &result, int TargetPair)
         {
             if (CurrentPair == 0)
              {
-                if (Id.size() == 10)  return false;
+                if (Id.size() == MAX_ID_SIZE)  return false;
 
                 // Create new pair
-                pair<char, unsigned int> NewPair;
-                NewPair.first = AllowedSymbols[0];
-                NewPair.second = 1;
-
-                Id[CurrentPair] = NewPair;
-                Id.push_back(NewPair); 
+                Id.push_back(AddNewPair());
             }
             else
             {
-                // Propagatre the increment
-                Id[CurrentPair].first = AllowedSymbols[0];
-                Id[CurrentPair].second = 1;
+                // Propagate the increment
+                AddNewPair(CurrentPair);
 
-                return Increment(result, --CurrentPair);
+                return Increment(Result, (int)--CurrentPair);
             }
         }
     }
 
-    result = ComposeString();
+    Result = ComposeString();
     
     return true;
 }
@@ -190,19 +201,6 @@ int main()
     Test("Z9-Z9");
     Test("Z1-Z9-Z9-Z9-Z9-Z9-Z9-Z9-Z9-Z9");
 
-    // Threads
-    CommonID.Set("Z9");
-
-    thread Th1(ThreadTest);
-    thread Th2(ThreadTest);
-    thread Th3(ThreadTest);
-
-    Th1.join();
-    Th2.join();
-    Th3.join();
-
-    cout << "Thread test (Initial is 'Z9'): " << CommonID.Get() << endl << endl;
-
     // Exceptions
     try
     {
@@ -222,6 +220,19 @@ int main()
     {
         cout << endl<< "Test of an approach to set incorrect ID:" << endl << ex.what() << endl;
     }
+
+    // Threads
+    CommonID.Set("Z9");
+
+    thread Th1(ThreadTest);
+    thread Th2(ThreadTest);
+    thread Th3(ThreadTest);
+
+    Th1.join();
+    Th2.join();
+    Th3.join();
+
+    cout << endl << "Thread test (Initial is 'Z9'): " << CommonID.Get() << endl;
 
     return 0;
 }
