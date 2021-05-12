@@ -17,7 +17,7 @@ using namespace std;
 #define MAX_ID_SIZE 10
 
 
-class IDs
+class ID
 {
     vector<pair<char, unsigned int>> Id;
 
@@ -42,7 +42,7 @@ public:
 
         Mutex.unlock();
 
-        if (!Res) throw std::out_of_range("Upper bound is violated");
+        if (!Res) throw out_of_range("Upper bound is violated");
         return Tmp;
     }
 
@@ -64,20 +64,19 @@ public:
 
         Mutex.unlock();
 
-        if (!Res) throw std::out_of_range("Incorrect Value");
+        if (!Res) throw out_of_range("Incorrect Value");
     }
 
-    IDs(string _Id)
+    ID(string _Id)
     {
-        if (!Assign(_Id)) throw std::out_of_range("Incorrect Value");
+        if (!Assign(_Id)) throw out_of_range("Incorrect Value");
     }
 
-    IDs() {}
-
+    ID() {}
 };
 
 
-bool IDs::Assign(string _Id)
+bool ID::Assign(string _Id)
 {
     if (_Id.empty() || _Id.size() > MAX_SIZE) return false;
 
@@ -100,7 +99,7 @@ bool IDs::Assign(string _Id)
     return true;
 }
 
-string IDs::ComposeString()
+string ID::ComposeString()
 {
     string Res = "";
 
@@ -115,7 +114,7 @@ string IDs::ComposeString()
 
     return Res;
 }
-pair<char, unsigned int> IDs::CreateInitialPair(size_t CurPairIndex)
+pair<char, unsigned int> ID::CreateInitialPair(size_t CurPairIndex)
 {
     pair<char, unsigned int> NewPair;
 
@@ -128,7 +127,7 @@ pair<char, unsigned int> IDs::CreateInitialPair(size_t CurPairIndex)
 }
 
 
-bool IDs::Increment(string &Result, int TargetPair)
+bool ID::Increment(string &Result, int TargetPair)
 {
     // Define the pair to work with
     size_t CurrentPairIndex = (TargetPair == NO_PAIR) ? Id.size() - 1 : (size_t)TargetPair;
@@ -180,12 +179,12 @@ void Test(string sID)
     static size_t TestNumber = 1;
 
     cout << "Test " << TestNumber << endl;
-    IDs Id(sID);
+    ID Id(sID);
     cout << "Inital ID:\t" << sID << endl << "Incremented ID:\t" << Id.Increment() << endl << endl;
     TestNumber++;
 }
 
-IDs CommonID;
+ID CommonID;
 
 void ThreadTest()
 {
@@ -214,7 +213,7 @@ int main()
 
     try
     {
-        IDs Test;
+        ID Test;
         Test.Set("D1-A0");
     }
     catch (const std::exception& ex)
@@ -237,4 +236,3 @@ int main()
 
     return 0;
 }
-
