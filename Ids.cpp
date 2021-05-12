@@ -29,7 +29,7 @@ class IDs
     string  ComposeString();
     bool    Increment(string& Result, int TargetPair);
 
-    pair<char, unsigned int> AddNewPair(size_t CurPair = 0);
+    pair<char, unsigned int> CreateInitialPair(size_t CurPair = 0); 
 
 public:
 
@@ -115,7 +115,7 @@ string IDs::ComposeString()
 
     return Res;
 }
-pair<char, unsigned int> IDs::AddNewPair(size_t CurPair)
+pair<char, unsigned int> IDs::CreateInitialPair(size_t CurPair)
 {
     pair<char, unsigned int> NewPair;
 
@@ -130,35 +130,36 @@ pair<char, unsigned int> IDs::AddNewPair(size_t CurPair)
 
 bool IDs::Increment(string &Result, int TargetPair)
 {
-    size_t CurrentPair = (TargetPair == NO_PAIR) ? Id.size() - 1 : (size_t)TargetPair;
+    // Define the pair to work with
+    size_t CurrentPairIndex = (TargetPair == NO_PAIR) ? Id.size() - 1 : (size_t)TargetPair;
 
-    Id[CurrentPair].second++;
+    Id[CurrentPairIndex].second++;
 
-    if (Id[CurrentPair].second == 10)
+    if (Id[CurrentPairIndex].second == 10)
     {
-        Id[CurrentPair].second = 1;
+        Id[CurrentPairIndex].second = 1;
 
-        auto CurLetter = find(begin(AllowedSymbols), end(AllowedSymbols), Id[CurrentPair].first);
+        auto CurLetter = find(begin(AllowedSymbols), end(AllowedSymbols), Id[CurrentPairIndex].first);
 
         if (*CurLetter != AllowedSymbols[AllowedSymbols.size()-1])
         {
-            Id[CurrentPair].first = *(CurLetter + 1);
+            Id[CurrentPairIndex].first = *(CurLetter + 1);
         }
         else 
         {
-            if (CurrentPair == 0)
+            if (CurrentPairIndex == 0)
              {
                 if (Id.size() == MAX_ID_SIZE)  return false;
 
                 // Create new pair
-                Id.push_back(AddNewPair());
+                Id.push_back(CreateInitialPair());
             }
             else
             {
                 // Propagate the increment
-                AddNewPair(CurrentPair);
+                CreateInitialPair(CurrentPairIndex);
 
-                return Increment(Result, (int)--CurrentPair);
+                return Increment(Result, (int)--CurrentPairIndex);
             }
         }
     }
